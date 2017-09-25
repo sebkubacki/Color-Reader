@@ -8,9 +8,41 @@ document.addEventListener('DOMContentLoaded', function(){
         super(props)
         this.state = {
             text: '',
-            color: 'lightgray',
-            info: ''
+            color: 'white',
+            info: '',
+            type: '',
+            rgb: '',
+            hsl: '',
+            hex: ''
           }
+        }
+
+        rgbToHex = () => {
+          let indexR = this.state.text.indexOf('(');
+          let indexG = this.state.text.indexOf(',');
+          let indexB = this.state.text.lastIndexOf(',');
+          let indexEnd = this.state.text.indexOf(')')
+          let r = this.state.text.slice(indexR+1, indexG);
+          let g = this.state.text.slice(indexG+1, indexB);
+          let b = this.state.text.slice(indexB+1, indexEnd);
+          console.log(b);
+          r = Number(r).toString(16);
+          g = Number(g).toString(16);
+          b = Number(b).toString(16);
+          let result = '#'+r+g+b;
+          this.setState({info: `${this.state.text} \n
+                                hex: ${result}`})
+        }
+
+        hexToRgb = () => {
+          let r = this.state.text.slice(1, 3);
+          let g = this.state.text.slice(3, 5);
+          let b = this.state.text.slice(5, 7);
+          r = parseInt(r, 16);
+          g = parseInt(g, 16);
+          b = parseInt(b, 16);
+          let result = `rgb(${r}, ${g}, ${b})`;
+          this.setState({info:`${result} \n hex: ${this.state.text}`})
         }
 
         handleInput = (e) => {
@@ -19,10 +51,19 @@ document.addEventListener('DOMContentLoaded', function(){
 
         handleSubmit = (e) => {
           e.preventDefault();
-          if(this.state.text.slice(0, 3) == 'rgb' || this.state.text.slice(0, 3) == 'hsl' || this.state.text.slice(0, 1) == '#'){
+          if(this.state.text.slice(0, 4) == 'rgb(' || this.state.text.slice(0, 4) == 'hsl(' || this.state.text.slice(0, 1) == '#'){
               this.setState({color: this.state.text})
               this.setState({info: this.state.text})
-              this.setState({text: ''})
+              if (this.state.text.slice(0, 4) == 'rgb(') {
+                this.rgbToHex();
+                this.setState({type: 'rgb'})
+              } else if (this.state.text.slice(0, 4) == 'hsl(') {
+                this.setState({type: 'hsl'})
+              } else if (this.state.text.slice(0, 1) == '#') {
+                this.setState({type: 'hex'})
+                console.log('hex');
+                this.hexToRgb();
+              }
           }
           else{
             this.setState({info: 'Invalid color format'})

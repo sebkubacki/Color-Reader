@@ -9417,16 +9417,52 @@ document.addEventListener('DOMContentLoaded', function () {
 
       var _this = _possibleConstructorReturn(this, (ColorReader.__proto__ || Object.getPrototypeOf(ColorReader)).call(this, props));
 
+      _this.rgbToHex = function () {
+        var indexR = _this.state.text.indexOf('(');
+        var indexG = _this.state.text.indexOf(',');
+        var indexB = _this.state.text.lastIndexOf(',');
+        var indexEnd = _this.state.text.indexOf(')');
+        var r = _this.state.text.slice(indexR + 1, indexG);
+        var g = _this.state.text.slice(indexG + 1, indexB);
+        var b = _this.state.text.slice(indexB + 1, indexEnd);
+        console.log(b);
+        r = Number(r).toString(16);
+        g = Number(g).toString(16);
+        b = Number(b).toString(16);
+        var result = '#' + r + g + b;
+        _this.setState({ info: _this.state.text + ' \n\n                                hex: ' + result });
+      };
+
+      _this.hexToRgb = function () {
+        var r = _this.state.text.slice(1, 3);
+        var g = _this.state.text.slice(3, 5);
+        var b = _this.state.text.slice(5, 7);
+        r = parseInt(r, 16);
+        g = parseInt(g, 16);
+        b = parseInt(b, 16);
+        var result = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+        _this.setState({ info: result + ' \n hex: ' + _this.state.text });
+      };
+
       _this.handleInput = function (e) {
         _this.setState({ text: e.target.value });
       };
 
       _this.handleSubmit = function (e) {
         e.preventDefault();
-        if (_this.state.text.slice(0, 3) == 'rgb' || _this.state.text.slice(0, 3) == 'hsl' || _this.state.text.slice(0, 1) == '#') {
+        if (_this.state.text.slice(0, 4) == 'rgb(' || _this.state.text.slice(0, 4) == 'hsl(' || _this.state.text.slice(0, 1) == '#') {
           _this.setState({ color: _this.state.text });
           _this.setState({ info: _this.state.text });
-          _this.setState({ text: '' });
+          if (_this.state.text.slice(0, 4) == 'rgb(') {
+            _this.rgbToHex();
+            _this.setState({ type: 'rgb' });
+          } else if (_this.state.text.slice(0, 4) == 'hsl(') {
+            _this.setState({ type: 'hsl' });
+          } else if (_this.state.text.slice(0, 1) == '#') {
+            _this.setState({ type: 'hex' });
+            console.log('hex');
+            _this.hexToRgb();
+          }
         } else {
           _this.setState({ info: 'Invalid color format' });
           console.log(_this.state.text.slice(0, 3));
@@ -9435,8 +9471,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
       _this.state = {
         text: '',
-        color: 'lightgray',
-        info: ''
+        color: 'white',
+        info: '',
+        type: '',
+        rgb: '',
+        hsl: '',
+        hex: ''
       };
       return _this;
     }
